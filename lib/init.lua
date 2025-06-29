@@ -127,16 +127,21 @@ function eruption:erupt(): ()
 			end
 
 			-- Connect lifecycles
-			RunService.RenderStepped:Connect(function(dt)
-				for _, article in articles do
-					if type(article.onRender) == "function" then
-						local ok, err = pcall(article.onRender, dt)
-						if not ok then
-							log.warn("eruption", "onRender", `error: {err}`)
-						end
-					end
-				end
-			end)
+			if RunService:IsClient() then
+                RunService.RenderStepped:Connect(function(dt)
+                    for _, article in articles do
+                        if type(article.onRender) == "function" then
+                            local ok, err = pcall(article.onRender, dt)
+                            if not ok then
+                                log.warn("eruption", "onRender", `error: {err}`)
+                            end
+                        end
+                    end
+                end)
+            else
+                log.print("eruption", "lifecycle", "skipped onRender: not available on server")
+            end
+            
 
 			RunService.Heartbeat:Connect(function(dt)
 				for _, article in articles do
