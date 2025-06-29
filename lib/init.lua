@@ -10,6 +10,7 @@ export type lifecycles = {
     onRender: (dt: number) -> ()?,
     onTick: (dt: number) -> ()?,
     onPhysics: (dt: number) -> ()?,
+	useLog: () -> (log.log),
 }
 
 -- Article type: lifecycle methods plus any other keys
@@ -190,6 +191,20 @@ function eruption:erupt()
                     end
                 end
             end)
+
+			for _, article in articles do
+				if type(article.useLog) == "function" then
+					local success, result = pcall(article.useLog, log)
+					if not success then
+						-- optionally warn if useLog errors
+						warn("Error calling useLog:", result)
+					else
+						-- You can return the log module or the result from useLog if needed
+						return log
+					end
+				end
+			end
+			
 
             log.print("eruption", "lifecycle", `lifecycles started for {#articles} article(s).`)
         end)
