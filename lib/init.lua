@@ -80,7 +80,7 @@ function eruption:erupt(): ()
     promise.all(promises):andThen(function()
         print(`[eruption] Loaded {#internal.declared} modules successfully.`)
     end):catch(function(err)
-        warn("[eruption] One or more modules failed to load:", err)
+        log.warn("eruption", "erupt", `one or more modules failed to load: {err}`)
     end)
 
 end
