@@ -1,0 +1,13 @@
+{
+  "name": "eruption",
+  "tree": {
+    "$className": "DataModel",
+
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "eruption": {
+        "$path": "lib"
+      }
+    }
+  }
+}
