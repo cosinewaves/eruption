@@ -10,7 +10,7 @@ export type log = {
 local log = {} :: log
 
 local function format(outer: string, inner: string, content: string): string
-	return `[eruption.{outer}.{inner}]: {content}`
+	return `[{outer}.{inner}]: {content}`
 end
 
 function log.print(outer: string, inner: string, content: string): ()

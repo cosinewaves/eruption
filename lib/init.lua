@@ -36,7 +36,7 @@ function internal.safeRequire(module: ModuleScript): ()
             resolve(result)
         else
             reject()
-            log.warn("internal", "safeRequire", `Error requiring module {module:GetFullName()}: {result}`)
+            log.warn("eruption", "internal.safeRequire", `error requiring module {module:GetFullName()}: {result}`)
         end
     end)
 end
@@ -60,10 +60,9 @@ function eruption.declareDescendants(container: Instance, argue: argue<Instance>
 end
 
 
-
 function eruption:erupt(): ()
     if internal.erupted then
-        warn("[eruption] Already erupted. Skipping.")
+        log.warn("eruption", "erupt", `already erupted`)
         return
     end
 
