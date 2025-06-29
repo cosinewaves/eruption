@@ -92,7 +92,7 @@ function eruption.article(): article
     }
     -- Attach private marker so we can identify valid articles
     rawset(self, PRIVATE_MARKER, true)
-    return self
+    return self :: article
 end
 
 function eruption:erupt()

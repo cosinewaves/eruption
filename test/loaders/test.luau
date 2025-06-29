@@ -1,7 +1,7 @@
-local eruption = require("../lib")
+local eruption = require("../../lib")
 
 -- Declare which modules to load
-eruption.declareDescendants(script, function(inst)
+eruption.declareDescendants(script.Parent.Parent.services, function(inst)
     return inst.Name:match("Service") -- only require modules with "Service" in name
 end)
 
