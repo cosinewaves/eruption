@@ -1,5 +1,3 @@
---!nonstrict
-
 -- Requirements
 local promise = require("@self/use/promise")
 
@@ -19,7 +17,7 @@ type internal = {
 
 -- Public Metatable
 local eruption = {} :: eruption
-setmetatable(eruption, { __index = eruption })
+
 
 -- Internal Metatable
 local internal = {
@@ -41,23 +39,24 @@ function internal.safeRequire(module: ModuleScript): ()
     end)
 end
 
-function eruption.loadDescendants(container: Instance, argue: argue<Instance>?): ()
+function eruption.declareChildren(container: Instance, argue: argue<Instance>?): ()
+    for _, child in container:GetChildren() do
+        if not child:IsA("ModuleScript") then continue end
+        if argue and not argue(child) then continue end
+
+        table.insert(internal.declared, child)
+    end
+end
+
+function eruption.declareDescendants(container: Instance, argue: argue<Instance>?): ()
     for _, descendant in container:GetDescendants() do
         if not descendant:IsA("ModuleScript") then continue end
         if argue and not argue(descendant) then continue end
 
-        internal.safeRequire(descendant):catch(function(err)
-            warn(`[eruption.loadDescendants] Failed to load {descendant:GetFullName()}:`, err)
-        end)
+        table.insert(internal.declared, descendant)
     end
 end
 
-function eruption.loadChildren(container: Instance, argue: argue<Instance>?): ()
-    eruption.loadDescendants(container, function(descendant)
-        local isDirectChild = descendant.Parent == container
-        return isDirectChild and (not argue or argue(descendant))
-    end)
-end
 
 
 function eruption:erupt(): ()
@@ -82,6 +81,6 @@ function eruption:erupt(): ()
     end):catch(function(err)
         warn("[eruption] One or more modules failed to load:", err)
     end)
+    
 end
-
-return eruption
+return setmetatable(eruption, { __index = eruption })
