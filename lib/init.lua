@@ -3,7 +3,6 @@ local RunService = game:GetService("RunService")
 local log = require("@self/aid/log")
 local promise = require("@self/use/promise")
 
-
 -- Types
 export type lifecycles = {
     init: () -> ()?,
@@ -20,6 +19,7 @@ export type eruption = {
     declareDescendants: (container: Instance, argue: argue<Instance>?) -> (),
     erupt: (self: eruption) -> (),
 }
+
 type internal = {
     declared: { article },
     erupted: boolean,
@@ -28,7 +28,6 @@ type internal = {
 
 -- Public Metatable
 local eruption = {} :: eruption
-
 
 -- Internal Metatable
 local internal = {
