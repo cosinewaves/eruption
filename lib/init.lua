@@ -137,8 +137,6 @@ function eruption:erupt(): ()
                         end
                     end
                 end)
-            else
-                log.print("eruption", "lifecycle", "skipped onRender: not available on server")
             end
             
 
