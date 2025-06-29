@@ -1,7 +1,4 @@
--- eruption.lua
--- Requires Roblox Studio with Luau type checking for full IntelliSense
--- Uses a private marker (newproxy) to detect valid articles at runtime
-
+-- Requirements
 local RunService = game:GetService("RunService")
 local log = require("@self/aid/log")
 local promise = require("@self/use/promise")
