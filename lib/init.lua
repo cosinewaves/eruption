@@ -68,6 +68,17 @@ function eruption.declareDescendants(container: Instance, argue: argue<Instance>
     end
 end
 
+-- article constructor: returns a table prefilled with lifecycle methods (default no-op)
+-- but freely extensible by the user
+function eruption.article(): article
+	return {
+		init = function() end,
+		onErupt = function() end,
+		onRender = function(_dt: number) end,
+		onTick = function(_dt: number) end,
+		onPhysics = function(_dt: number) end,
+	}
+end
 
 function eruption:erupt(): ()
 	if internal.erupted then
