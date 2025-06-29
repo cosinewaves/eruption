@@ -17,7 +17,7 @@ type internal = {
     safeRequire: (module: ModuleScript) -> (),
 }
 
--- Metatable
+-- Public Metatable
 local eruption = {} :: eruption
 setmetatable(eruption, {__index = eruption})
 
