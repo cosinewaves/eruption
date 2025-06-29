@@ -144,3 +144,5 @@ eruption.declareDescendants(game.ServerScriptService.Services)
 -- Start loading and lifecycle execution
 eruption:erupt()
 ```
+
+> credits to `ratplier/artwork` for idea and inspiration for this project
