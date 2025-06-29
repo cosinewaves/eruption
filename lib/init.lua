@@ -1,9 +1,19 @@
 -- Requirements
+local RunService = game:GetService("RunService")
 local log = require("@self/aid/log")
 local promise = require("@self/use/promise")
 
+
 -- Types
-export type article = { [any]: any }
+export type lifecycles = {
+    init: () -> ()?,
+    onErupt: () -> ()?,
+    onRender: (dt: number) -> ()?,
+    onTick: (dt: number) -> ()?,
+    onPhysics: (dt: number) -> ()?,
+}
+
+export type article = { [any]: (any & lifecycles) }
 export type argue<T> = (T) -> boolean
 export type eruption = {
     declareChildren: (container: Instance, argue: argue<Instance>?) -> (),
@@ -61,27 +71,100 @@ end
 
 
 function eruption:erupt(): ()
-    if internal.erupted then
-        log.warn("eruption", "erupt", `already erupted`)
-        return
-    end
+	if internal.erupted then
+		log.warn("eruption", "erupt", `already erupted`)
+		return
+	end
 
-    internal.erupted = true
+	internal.erupted = true
 
-    -- Create list of promises to require each declared module
-    local promises = {}
+	local promises = {}
 
-    for _, module in internal.declared do
-        table.insert(promises, internal.safeRequire(module):catch(function(err)
-            log.warn("eruption", "erupt", `failed to load module: {module.Name}: {err}`)
-        end))
-    end
+	-- Require all declared modules
+	for _, module in internal.declared do
+		table.insert(promises, internal.safeRequire(module):andThen(function(loaded)
+			return loaded
+		end):catch(function(err)
+			log.warn("eruption", "require", `failed to load module: {module.Name}: {err}`)
+			return nil
+		end))
+	end
 
-    promise.all(promises):andThen(function()
-        log.print("eruption", "erupt", `successfully loaded {#internal.declared} modules.`)
-    end):catch(function(err)
-        log.warn("eruption", "erupt", `one or more modules failed to load: {err}`)
-    end)
+	-- After all modules are loaded
+	promise.all(promises):andThen(function(results)
+		log.print("eruption", "erupt", `successfully loaded {#results} modules.`)
 
+		local articles = {}
+
+		for _, result in results do
+			if typeof(result) == "table" then
+				table.insert(articles, result)
+			end
+		end
+
+		-- Init lifecycle
+		local initPromises = {}
+		for _, article in articles do
+			if type(article.init) == "function" then
+				local ok, result = pcall(article.init)
+				if ok and promise.is(result) then
+					table.insert(initPromises, result)
+				elseif not ok then
+					log.warn("eruption", "init", `error in init: {result}`)
+				end
+			end
+		end
+
+		return promise.all(initPromises):andThen(function()
+			-- onErupt
+			for _, article in articles do
+				if type(article.onErupt) == "function" then
+					local ok, result = pcall(article.onErupt)
+					if not ok then
+						log.warn("eruption", "onErupt", `error: {result}`)
+					end
+				end
+			end
+
+			-- Connect lifecycles
+			RunService.RenderStepped:Connect(function(dt)
+				for _, article in articles do
+					if type(article.onRender) == "function" then
+						local ok, err = pcall(article.onRender, dt)
+						if not ok then
+							log.warn("eruption", "onRender", `error: {err}`)
+						end
+					end
+				end
+			end)
+
+			RunService.Heartbeat:Connect(function(dt)
+				for _, article in articles do
+					if type(article.onPhysics) == "function" then
+						local ok, err = pcall(article.onPhysics, dt)
+						if not ok then
+							log.warn("eruption", "onPhysics", `error: {err}`)
+						end
+					end
+				end
+			end)
+
+			RunService.Stepped:Connect(function(_, dt)
+				for _, article in articles do
+					if type(article.onTick) == "function" then
+						local ok, err = pcall(article.onTick, dt)
+						if not ok then
+							log.warn("eruption", "onTick", `error: {err}`)
+						end
+					end
+				end
+			end)
+
+			log.print("eruption", "lifecycle", `lifecycles started for {#articles} article(s).`)
+		end)
+	end):catch(function(err)
+		log.warn("eruption", "final", `one or more modules failed lifecycle init: {err}`)
+	end)
 end
+
 return setmetatable(eruption, { __index = eruption })
