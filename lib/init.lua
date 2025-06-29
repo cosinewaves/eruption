@@ -35,8 +35,8 @@ function internal.safeRequire(module: ModuleScript): ()
         if success then
             resolve(result)
         else
-            reject(`Error requiring module {module:GetFullName()}: {result}`)
-            log.warn("internal", inner, content)
+            reject()
+            log.warn("internal", "safeRequire", `Error requiring module {module:GetFullName()}: {result}`)
         end
     end)
 end
