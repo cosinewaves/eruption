@@ -1,4 +1,5 @@
 -- Requirements
+local log = require("@self/aid/log")
 local promise = require("@self/use/promise")
 
 -- Types
@@ -35,6 +36,7 @@ function internal.safeRequire(module: ModuleScript): ()
             resolve(result)
         else
             reject(`Error requiring module {module:GetFullName()}: {result}`)
+            log.warn("internal", inner, content)
         end
     end)
 end
@@ -81,6 +83,6 @@ function eruption:erupt(): ()
     end):catch(function(err)
         warn("[eruption] One or more modules failed to load:", err)
     end)
-    
+
 end
 return setmetatable(eruption, { __index = eruption })
