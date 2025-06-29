@@ -41,34 +41,24 @@ function internal.safeRequire(module: ModuleScript): ()
     end)
 end
 
-function eruption.declareChildren(container: Instance, argue: argue<Instance>?): ()
-    for _, child in container:GetChildren() do
-        if not child:IsA("ModuleScript") then
-            continue
-        end
-
-        if argue and not argue(child) then
-            continue
-        end
-
-        table.insert(internal.declared, child)
-    end
-end
-
-
-function eruption.declareDescendants(container: Instance, argue: argue<Instance>?): ()
+function eruption.loadDescendants(container: Instance, argue: argue<Instance>?): ()
     for _, descendant in container:GetDescendants() do
-        if not descendant:IsA("ModuleScript") then
-            continue
-        end
+        if not descendant:IsA("ModuleScript") then continue end
+        if argue and not argue(descendant) then continue end
 
-        if argue and not argue(descendant) then
-            continue
-        end
-
-        table.insert(internal.declared, descendant)
+        internal.safeRequire(descendant):catch(function(err)
+            warn(`[eruption.loadDescendants] Failed to load {descendant:GetFullName()}:`, err)
+        end)
     end
 end
+
+function eruption.loadChildren(container: Instance, argue: argue<Instance>?): ()
+    eruption.loadDescendants(container, function(descendant)
+        local isDirectChild = descendant.Parent == container
+        return isDirectChild and (not argue or argue(descendant))
+    end)
+end
+
 
 function eruption:erupt(): ()
     if internal.erupted then
