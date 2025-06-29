@@ -19,7 +19,7 @@
 
 ## Installation
 
-Place the `eruption.lua` and `article.lua` modules in your project (e.g. `ReplicatedStorage/eruption`).
+Place the `eruption.lua` module in your project (e.g. `ReplicatedStorage/eruption`).
 
 Require and use in a server script or local script like:
 
