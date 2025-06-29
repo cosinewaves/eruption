@@ -7,7 +7,7 @@ local promise = require("@self/use/promise")
 export type article = { [any]: any }
 export type argue<T> = (T) -> boolean
 export type eruption = {
-    declareChildren: (container: Instance) -> (),
+    declareChildren: (container: Instance, argue: argue<Instance>?) -> (),
     declareDescendants: (container: Instance, argue: argue<Instance>?) -> (),
     erupt: (self: eruption) -> (),
 }
@@ -41,13 +41,20 @@ function internal.safeRequire(module: ModuleScript): ()
     end)
 end
 
-function eruption.declareChildren(container: Instance): ()
+function eruption.declareChildren(container: Instance, argue: argue<Instance>?): ()
     for _, child in container:GetChildren() do
-        if child:IsA("ModuleScript") then
-            table.insert(internal.declared, child)
+        if not child:IsA("ModuleScript") then
+            continue
         end
+
+        if argue and not argue(child) then
+            continue
+        end
+
+        table.insert(internal.declared, child)
     end
 end
+
 
 function eruption.declareDescendants(container: Instance, argue: argue<Instance>?): ()
     for _, descendant in container:GetDescendants() do
