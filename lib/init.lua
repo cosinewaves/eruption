@@ -1,4 +1,4 @@
---!strict
+--!nonstrict
 
 -- Requirements
 local promise = require("@self/use/promise")
@@ -30,7 +30,7 @@ setmetatable(internal, {__index = internal})
 
 -- Functions
 
-local function saferequireAsync(module: ModuleScript): ()
+function internal.safeRequire(module: ModuleScript): ()
     return promise.new(function(resolve, reject)
         local success, result = pcall(require, module)
         if success then
