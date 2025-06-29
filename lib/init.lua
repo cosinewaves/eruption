@@ -73,7 +73,7 @@ function eruption:erupt(): ()
 
     for _, module in internal.declared do
         table.insert(promises, internal.safeRequire(module):catch(function(err)
-            warn(`[eruption] Failed to load module: {module.Name}`, err)
+            log.warn("eruption", "erupt", `failed to load module: {module.Name}: {err}`)
         end))
     end
 
