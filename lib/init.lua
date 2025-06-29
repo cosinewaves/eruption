@@ -204,9 +204,9 @@ function eruption:erupt()
 					end
 				end
 			end
-			
 
             log.print("eruption", "lifecycle", `lifecycles started for {#articles} article(s).`)
+			return
         end)
     end):catch(function(err)
         log.warn("eruption", "final", `one or more modules failed lifecycle init: {err}`)
