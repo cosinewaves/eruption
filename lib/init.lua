@@ -213,4 +213,4 @@ function eruption:erupt()
 	end)
 end
 
-return setmetatable(eruption, { __index = eruption })
+return eruption
